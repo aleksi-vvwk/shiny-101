@@ -1496,8 +1496,8 @@ log(\mu) = \beta_0 + \beta_1 x  \\
 ##          b &lt;- -0.5*sum((data-mu)^2) / (sigma^2)
 ##          -(a + b)
 ##     }
-## &lt;bytecode: 0x7f878dc884a8&gt;
-## &lt;environment: 0x7f878aff47c8&gt;</code></pre>
+## &lt;bytecode: 0x7fb1e7861ba0&gt;
+## &lt;environment: 0x7fb1e43526d8&gt;</code></pre>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimating Prameters</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">optim</span>(<span class="fu">c</span>(<span class="at">mu =</span> <span class="dv">0</span>, <span class="at">sigma =</span> <span class="dv">1</span>), nLL)<span class="sc">$</span>par</span></code></pre></div>
 <pre><code>##       mu    sigma 
@@ -1565,7 +1565,7 @@ log(\mu) = \beta_0 + \beta_1 x  \\
 <span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    }</span>
 <span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
 <pre><code>##    user  system elapsed 
-##   0.136   0.010   0.149</code></pre>
+##   0.124   0.008   0.147</code></pre>
 <ul>
 <li><code>system.time(expression)</code>
 <ul>

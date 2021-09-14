@@ -2,7 +2,7 @@
 #####   Detecting Faudulent Transactions   #####
 ################################################
 
-# The domain is sales data. We want to find 
+# The domain is sales data. We want to find
 # "strange" transaction reports that may be
 # fraudulent.
 
@@ -41,7 +41,7 @@ str(sales)
 
 # Val - reported total monetary value of the sale
 
-# Insp - Factor, 3 possible values: (1) ok, if 
+# Insp - Factor, 3 possible values: (1) ok, if
 # transaction inspected and determined to be
 # valid; (2) fraud, is found to be fraudulent;
 # and (3) unk if unknown (not inspected yet)
@@ -53,14 +53,14 @@ str(sales)
 # Overview of statistical properties of data:
 summary(sales)
 
-# We see that: 
+# We see that:
 # there are large numbers of unknown values in
 # columns Quant and Val. This would be a problem
 # if they are NA is same record as the transac-
 # tion report would be missing crucial info
 # about the sale
 
-?nlevels # shows number of levels of a factor
+? nlevels # shows number of levels of a factor
 
 # have bunches of salespeople
 nlevels(sales$ID)
@@ -70,10 +70,8 @@ nlevels(sales$Prod)
 
 # We check if Quant and Val are both missing
 # together much (length returns number 888)
-length(
-  which(
-    is.na(sales$Quant) &
-    is.na(sales$Val)))
+length(which(is.na(sales$Quant) &
+               is.na(sales$Val)))
 
 # With large data sets, is likely easier to
 # simply perform "logical arithmetic" where
@@ -85,11 +83,11 @@ sum(is.na(sales$Quant) & is.na(sales$Val))
 # of frauds is relatively low, even if we only
 # take into account the reports that were
 # inspected (about 0.003166)
-table(sales$Insp)/nrow(sales)*100
+table(sales$Insp) / nrow(sales) * 100
 
 # We look at number of transactions per
 # salesperson. There is much variability, also
-# if we look at number of transactions per 
+# if we look at number of transactions per
 # product
 
 # Set up table for counts of transactions
@@ -102,16 +100,22 @@ table(sales$Insp)/nrow(sales)*100
 
 # We can see this variability in plots;
 # Plot of transactions per salesperson:
-barplot(totS,
-        main='Transactions per salesperson',
-        names.arg='',xlab='Salespeople',
-        ylab='Amount')
+barplot(
+  totS,
+  main = 'Transactions per salesperson',
+  names.arg = '',
+  xlab = 'Salespeople',
+  ylab = 'Amount'
+)
 
 # Plot of transactions per product:
-barplot(totP,
-        main='Transactions per product',
-        names.arg='',xlab='Products',
-        ylab='Amount')
+barplot(
+  totP,
+  main = 'Transactions per product',
+  names.arg = '',
+  xlab = 'Products',
+  ylab = 'Amount'
+)
 
 # Variables Quant and Val show a lot of
 # variability also, indicating differences
@@ -130,7 +134,7 @@ barplot(totP,
 
 # We add this derived unit price per transac-
 # tion as a new column to the data frame:
-sales$Uprice <- sales$Val/sales$Quant
+sales$Uprice <- sales$Val / sales$Quant
 
 # Unit price should be relatively constant
 # over the transactions of the same product.
@@ -146,7 +150,7 @@ summary(sales$Uprice)
 # We again observed a marked variability.
 
 # Given this observation, we should analyze
-# the set of transactions on each product 
+# the set of transactions on each product
 # individually, looking for suspicious tran-
 # sactions on each of these sets.
 
@@ -172,9 +176,9 @@ attach(sales)
 # aggregate() applies a function that produces
 # some scalar value (median here) to subsets
 # separated on some factor (ind. products)
-upp <- aggregate(sales$Uprice,list(Prod),median,na.rm=T)
+upp <- aggregate(sales$Uprice, list(Prod), median, na.rm = T)
 # Let's take a look at upp
-upp[1:10,]
+upp[1:10, ]
 
 # We generate five most (and least) expensive
 # by varying the parameter 'decreasing' of the
@@ -184,7 +188,7 @@ topP <- sapply(c(T, F),
                  upp[order(upp[, 2],
                            decreasing = o)[1:5], 1])
 
-colnames(topP) <- c('Expensive','Cheap')
+colnames(topP) <- c('Expensive', 'Cheap')
 topP
 
 # We confirm the completely different price
@@ -193,25 +197,27 @@ topP
 
 # The %in% operator tests if a value
 # belongs to a set.
-tops <- sales[Prod %in% topP[1,],
-              c('Prod','Uprice')]
+tops <- sales[Prod %in% topP[1, ],
+              c('Prod', 'Uprice')]
 tops$Prod <- factor(tops$Prod)
 # The scales of the prices of the most expensive
 # and least expensive products are rather different.
 # So we use a log scale to keep the values of
 # the cheap product from being indistinguishable.
 # Y-axis is on loag scale.
-boxplot(Uprice ~ Prod,data=tops,
-        ylab='Uprice',log="y")
+boxplot(Uprice ~ Prod,
+        data = tops,
+        ylab = 'Uprice',
+        log = "y")
 
 # We carry out a similar analysis to discover
 # whcih salespeople are ones who bring more
 # (less) money into the company.
 
-vs <- aggregate(Val,list(ID),sum,na.rm=T)
-scoresSs <- sapply(c(T,F),function(o) 
-                   vs[order(vs$x,decreasing=o)[1:5],1])
-colnames(scoresSs) <- c('Most','Least')
+vs <- aggregate(Val, list(ID), sum, na.rm = T)
+scoresSs <- sapply(c(T, F), function(o)
+  vs[order(vs$x, decreasing = o)[1:5], 1])
+colnames(scoresSs) <- c('Most', 'Least')
 scoresSs
 
 # The top 100 salespeople account for almost
@@ -220,26 +226,29 @@ scoresSs
 # 2% of the income:
 
 # Percent of company income top 100 salespeople:
-sum(vs[order(vs$x,decreasing=T)[1:100],2])/sum(Val,na.rm=T)*100
+sum(vs[order(vs$x, decreasing = T)[1:100], 2]) / sum(Val, na.rm = T) * 100
 
 # Percent of company income bottom 2,000:
-sum(vs[order(vs$x,decreasing=F)[1:2000],2])/sum(Val,na.rm=T)*100
+sum(vs[order(vs$x, decreasing = F)[1:2000], 2]) / sum(Val, na.rm = T) *
+  100
 
 # If we carry out a similar analysis in terms of
 # the quantity that is sold for each product, the
 # results are even more unbalanced:
-qs <- aggregate(Quant,list(Prod),sum,na.rm=T)
-scoresPs <- sapply(c(T,F),function(o) 
-                   qs[order(qs$x,decreasing=o)[1:5],1])
-colnames(scoresPs) <- c('Most','Least')
+qs <- aggregate(Quant, list(Prod), sum, na.rm = T)
+scoresPs <- sapply(c(T, F), function(o)
+  qs[order(qs$x, decreasing = o)[1:5], 1])
+colnames(scoresPs) <- c('Most', 'Least')
 scoresPs
 
 # Top 100 products represent nearly 75% of sales volume:
-sum(as.double(qs[order(qs$x,decreasing=T)[1:100],2]))/sum(as.double(Quant),na.rm=T)*100
+sum(as.double(qs[order(qs$x, decreasing = T)[1:100], 2])) / sum(as.double(Quant), na.rm =
+                                                                  T) * 100
 
 # 4,000 of the 4,548 products account for less
 # than 10% of the sales volume:
-sum(as.double(qs[order(qs$x,decreasing=F)[1:4000],2]))/sum(as.double(Quant),na.rm=T)*100
+sum(as.double(qs[order(qs$x, decreasing = F)[1:4000], 2])) / sum(as.double(Quant), na.rm =
+                                                                   T) * 100
 
 # Salespeople can change the price of an item if
 # they want, but we still assume that the unit price
@@ -264,8 +273,9 @@ sum(as.double(qs[order(qs$x,decreasing=F)[1:4000],2]))/sum(as.double(Quant),na.r
 
 # We determine the number of outliers (by above
 # definition) of each product:
-out <- tapply(Uprice,list(Prod=Prod),
-              function(x) length(boxplot.stats(x)$out))
+out <- tapply(Uprice, list(Prod = Prod),
+              function(x)
+                length(boxplot.stats(x)$out))
 
 # boxplot.stats() function obtains statistics used
 # in the construction of box plots. It returns a
@@ -273,13 +283,13 @@ out <- tapply(Uprice,list(Prod=Prod),
 # considered to be outliers.
 
 # The products with more outliers are:
-out[order(out,decreasing=T)[1:10]]
+out[order(out, decreasing = T)[1:10]]
 
 # We see that 29,446 transactions are outliers:
 sum(out)
 
 # which is approximately 7% of total transactions:
-sum(out)/nrow(sales)*100
+sum(out) / nrow(sales) * 100
 
 # We could have data problems, we already know that
 # some of the transactions have been flagged as
@@ -315,7 +325,7 @@ sum(out)/nrow(sales)*100
 # problematic transactions with unknowns in both
 # Val and Quant are (note use of which()):
 nas <- sales[which(is.na(Quant) & is.na(Val)),
-             c('ID','Prod')]
+             c('ID', 'Prod')]
 nas
 
 # How many?
@@ -323,9 +333,9 @@ nrow(nas) # 888 of them
 
 # Salespeople with larger proportions of transac-
 # tions with unknowns in both Val and Quant:
-propS <- 100*table(nas$ID)/totS
+propS <- 100 * table(nas$ID) / totS
 # We just go for top 10:
-propS[order(propS,decreasing=T)[1:10]]
+propS[order(propS, decreasing = T)[1:10]]
 
 # Seems reasonable to delete these transactions
 # of salespeople as they only represent a small
@@ -334,8 +344,8 @@ propS[order(propS,decreasing=T)[1:10]]
 # risky.
 
 # Here they are with respect to the products:
-propP <- 100*table(nas$Prod)/totP
-propP[order(propP,decreasing=T)[1:10]]
+propP <- 100 * table(nas$Prod) / totP
+propP[order(propP, decreasing = T)[1:10]]
 
 # Are several products that would have more than
 # 20% of their transactions removed, particularly
@@ -359,25 +369,26 @@ detach(sales)
 
 # Note we 'negative out' the records with both
 # Val and Quant missing.
-sales <- sales[-which(is.na(sales$Quant) & is.na(sales$Val)),]
+sales <- sales[-which(is.na(sales$Quant) & is.na(sales$Val)), ]
 
 # We begin to analyze remaining reports with either
 # Quant or Val missing.
 
 # Calculate proportion of transactions of each product
 # that have quantity unknown:
-nnasQp <- tapply(sales$Quant,list(sales$Prod),
-                 function(x) sum(is.na(x)))
-propNAsQp <- nnasQp/table(sales$Prod)
+nnasQp <- tapply(sales$Quant, list(sales$Prod),
+                 function(x)
+                   sum(is.na(x)))
+propNAsQp <- nnasQp / table(sales$Prod)
 # Look at top ten as usual:
-propNAsQp[order(propNAsQp,decreasing=T)[1:10]]
+propNAsQp[order(propNAsQp, decreasing = T)[1:10]]
 
 # Products p2442 and p2443 have all transactions with
 # unknown values for quantity, making it impossible to
 # calculate typical unit price.
 
 # We delete them:
-sales <- sales[!sales$Prod %in% c('p2442','p2443'),]
+sales <- sales[!sales$Prod %in% c('p2442', 'p2443'), ]
 
 # Having deleted two products, we update levels of
 # the column Prod:
@@ -385,11 +396,13 @@ nlevels(sales$Prod)
 sales$Prod <- factor(sales$Prod)
 nlevels(sales$Prod)
 
-# Are there salespeople with all transactions 
+# Are there salespeople with all transactions
 # that have an unknown quantity?:
-nnasQs <- tapply(sales$Quant,list(sales$ID),function(x) sum(is.na(x)))
-propNAsQs <- nnasQs/table(sales$ID)
-propNAsQs[order(propNAsQs,decreasing=T)[1:10]]
+nnasQs <-
+  tapply(sales$Quant, list(sales$ID), function(x)
+    sum(is.na(x)))
+propNAsQs <- nnasQs / table(sales$ID)
+propNAsQs[order(propNAsQs, decreasing = T)[1:10]]
 
 # Yep. Are 5 salespeople who have not filled in
 # the information on the quantity in their reports.
@@ -403,18 +416,20 @@ propNAsQs[order(propNAsQs,decreasing=T)[1:10]]
 # an unknown value in Val. First, proportion of
 # transactions of each product with unknown value in
 # this column:
-nnasVp <- tapply(sales$Val,list(sales$Prod),
-                 function(x) sum(is.na(x)))
-propNAsVp <- nnasVp/table(sales$Prod)
-propNAsVp[order(propNAsVp,decreasing=T)[1:10]]
+nnasVp <- tapply(sales$Val, list(sales$Prod),
+                 function(x)
+                   sum(is.na(x)))
+propNAsVp <- nnasVp / table(sales$Prod)
+propNAsVp[order(propNAsVp, decreasing = T)[1:10]]
 
 # The numbers are reasonable so it does not make sense
 # to delete these transactions as we may try to fill in
 # these holes using the other transactions. With respect
 # to salesperson, the numbers are as follows:
-nnasVs <- tapply(sales$Val,list(sales$ID),function(x) sum(is.na(x)))
-propNAsVs <- nnasVs/table(sales$ID)
-propNAsVs[order(propNAsVs,decreasing=T)[1:10]]
+nnasVs <- tapply(sales$Val, list(sales$ID), function(x)
+  sum(is.na(x)))
+propNAsVs <- nnasVs / table(sales$ID)
+propNAsVs[order(propNAsVs, decreasing = T)[1:10]]
 
 # Again, these proportions are not too high.
 
@@ -429,9 +444,9 @@ propNAsVs[order(propNAsVs,decreasing=T)[1:10]]
 # to be fraudulent. For remaining (non-fraud) transactions
 # we use median unit price of the transactions as the
 # 'typical' unit price:
-tPrice <- tapply(sales[sales$Insp != 'fraud','Uprice'],
+tPrice <- tapply(sales[sales$Insp != 'fraud', 'Uprice'],
                  list(sales[sales$Insp != 'fraud',
-                            'Prod']),median,na.rm=T)
+                            'Prod']), median, na.rm = T)
 
 # Look at tPrice
 tPrice
@@ -456,22 +471,22 @@ noQuant <- which(is.na(sales$Quant))
 # ceiling() avoids non-integer values of Quant; it returns
 # the smallest integer not less than the number used as
 # the argument:
-sales[noQuant,'Quant'] <- ceiling(sales[noQuant,'Val'] /
-                                  tPrice[sales[noQuant,'Prod']])
+sales[noQuant, 'Quant'] <- ceiling(sales[noQuant, 'Val'] /
+                                     tPrice[sales[noQuant, 'Prod']])
 noVal <- which(is.na(sales$Val))
-sales[noVal,'Val'] <- sales[noVal,'Quant'] *
-                      tPrice[sales[noVal,'Prod']]
+sales[noVal, 'Val'] <- sales[noVal, 'Quant'] *
+  tPrice[sales[noVal, 'Prod']]
 
 # We have filled in Quant and Val values so now we
 # recalculate the Uprice column to fill in the previously
 # unknown unit prices:
-sales$Uprice <- sales$Val/sales$Quant
+sales$Uprice <- sales$Val / sales$Quant
 getwd()
 # So now we have a dataset with no missing (or unknown)
 # values. We want to save this current state of the sales
 # data frame so we can restart our analysis from this
 # point from now on:
-save(sales,file='salesClean.Rdata')
+save(sales, file = 'salesClean.Rdata')
 
 # We can load saved objects back to workspace with load().
 
@@ -501,39 +516,49 @@ save(sales,file='salesClean.Rdata')
 # product:
 attach(sales)
 notF <- which(Insp != 'fraud')
-ms <- tapply(Uprice[notF],list(Prod=Prod[notF]),
+ms <- tapply(Uprice[notF], list(Prod = Prod[notF]),
              function(x) {
-    # boxplot.stats() obtains values of median,
-    # 1st and 3rd quartiles calculated for all
-    # sets of transactions of each product, eliminating
-    # the fraudulent transactions
-     bp <- boxplot.stats(x)$stats
-     c(median=bp[3],iqr=bp[4]-bp[2])
-   })
+               # boxplot.stats() obtains values of median,
+               # 1st and 3rd quartiles calculated for all
+               # sets of transactions of each product, eliminating
+               # the fraudulent transactions
+               bp <- boxplot.stats(x)$stats
+               c(median = bp[3], iqr = bp[4] - bp[2])
+             })
 # Using this we obtain a matrix of the median and
 # IQR for each product:
 ms <- matrix(unlist(ms),
-             length(ms),2,
-             byrow=T,
-             dimnames=list(names(ms),c('median','iqr')))
+             length(ms),
+             2,
+             byrow = T,
+             dimnames = list(names(ms), c('median', 'iqr')))
 head(ms)
 
 # Now we plot each product according to its respective
 # median and IQR
-par(mfrow=c(1,2))
+par(mfrow = c(1, 2))
 # Too many overlap with regular scales
 # Note p3689 top right
-plot(ms[,1],ms[,2],xlab='Median',
-     ylab='IQR',main='Some Properties of the ')
+plot(ms[, 1],
+     ms[, 2],
+     xlab = 'Median',
+     ylab = 'IQR',
+     main = 'Some Properties of the ')
 # So we use a log scale in second plot and
 # we use '+' to indicate transactions with
 # fewer than 20 transactions. log=xy sets
 # log scales of both axes of second plot:
-plot(ms[,1],ms[,2],xlab='Median',
-     ylab='IQR',main='Distributions of Unit Prices',
-     col='grey',log="xy")
+plot(
+  ms[, 1],
+  ms[, 2],
+  xlab = 'Median',
+  ylab = 'IQR',
+  main = 'Distributions of Unit Prices',
+  col = 'grey',
+  log = "xy"
+)
 smalls <- which(table(Prod) < 20)
-points(log(ms[smalls,1]),log(ms[smalls,2]),pch='+')
+points(log(ms[smalls, 1]), log(ms[smalls, 2]), pch = '+')
 
 # Can see are many products with approximately
 # same median and IQR, suggesting similarities
@@ -557,7 +582,7 @@ points(log(ms[smalls,1]),log(ms[smalls,2]),pch='+')
 # two empirical cumulative distribution functions.
 # Similar distributions will have small CDF diffs.
 
-# For each product with fewer than 20 transactions, 
+# For each product with fewer than 20 transactions,
 # we search for the product with the most similar
 # unit price distribution and then use a K-S test
 # to check if similarity is statistically significant.
@@ -573,29 +598,32 @@ dms <- scale(ms)
 # Then gather up those transactions with < 20
 smalls <- which(table(Prod) < 20)
 # Get list of unit prices by product:
-prods <- tapply(sales$Uprice,sales$Prod,list)
+prods <- tapply(sales$Uprice, sales$Prod, list)
 # Set up matrix for results of K-S test:
-similar <- matrix(NA,length(smalls),
-                  7,dimnames=list(names(smalls),
-                                  c('Simil',
-                                    'ks.stat',
-                                    'ks.p','medP',
-                                    'iqrP','medS',
-                                    'iqrS')))
+similar <- matrix(NA, length(smalls),
+                  7, dimnames = list(
+                    names(smalls),
+                    c('Simil',
+                      'ks.stat',
+                      'ks.p', 'medP',
+                      'iqrP', 'medS',
+                      'iqrS')
+                  ))
 # Main loop goes over all products with few trans:
-for(i in seq(along=smalls)) {
+for (i in seq(along = smalls)) {
   # the next two statements calculate distance
   # between the distribution properties of the
   # current product (i)
-  d <- scale(dms,dms[smalls[i],],FALSE)
+  d <- scale(dms, dms[smalls[i], ], FALSE)
   # and all other products; d is those distances;
   # the second smallest distance is the product
   # that is the most similar
-  d <- sqrt(drop(d^2 %*% rep(1,ncol(d))))
+  d <- sqrt(drop(d ^ 2 %*% rep(1, ncol(d))))
   # Perform Kolmogorov-Smirnov test to compare
   # the two distributions of unit prices
-  stat <- ks.test(prods[[smalls[i]]],prods[[order(d)[2]]])
-  similar[i,] <- c(order(d)[2],stat$statistic,stat$p.value,ms[smalls[i],],ms[order(d)[2],])
+  stat <- ks.test(prods[[smalls[i]]], prods[[order(d)[2]]])
+  similar[i, ] <-
+    c(order(d)[2], stat$statistic, stat$p.value, ms[smalls[i], ], ms[order(d)[2], ])
 }
 
 # ks.stat is the maximum difference between the
@@ -607,15 +635,15 @@ head(similar)
 # we are obtaining the most similar product
 
 # Can obtain respective similar product ID with:
-levels(Prod)[similar[1,1]]
+levels(Prod)[similar[1, 1]]
 
 # So now we can check how many products have a
 # product whose unit price distribution is
 # significantly similar with 90% confidence.
-nrow(similar[similar[,'ks.p'] >= 0.9,])
+nrow(similar[similar[, 'ks.p'] >= 0.9, ])
 
 # Or, more efficiently:
-sum(similar[,'ks.p'] >= 0.9)
+sum(similar[, 'ks.p'] >= 0.9)
 
 ###########################################
 # So, for the 985 products with fewer than
@@ -628,5 +656,5 @@ sum(similar[,'ks.p'] >= 0.9)
 
 # We save the similar object in case we decide
 # to use this similarity between products later:
-save(similar,file='similarProducts.Rdata')
+save(similar, file = 'similarProducts.Rdata')
 #############################################
